@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aim Trainer</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background-color: #111;
+      color: #fff;
+      margin: 0;
+      padding: 0;
+    }
+
+    h1 {
+      margin: 20px 0;
+    }
+
+    #gameContainer {
+      width: 600px;
+      height: 400px;
+      margin: 0 auto;
+      border: 2px solid white;
+      position: relative;
+      background: radial-gradient(#222, #000);
+    }
+
+    #target {
+      width: 40px;
+      height: 40px;
+      background-color: red;
+      border-radius: 50%;
+      position: absolute;
+      display: none;
+      cursor: pointer;
+    }
+
+    #stats {
+      margin: 20px 0;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h1>Aim Trainer</h1>
+
+  <div id="gameContainer">
+    <div id="target"></div>
+  </div>
+
+  <div id="stats">
+    <p>Time Left: <span id="timeLeft">60</span>s</p>
+    <p>Hits: <span id="hits">0</span> | Misses: <span id="misses">0</span> | Accuracy: <span id="accuracy">0</span>%</p>
+  </div>
+
+  <button onclick="startGame()">Start Game</button>
+
+  <script>
+    const target = document.getElementById('target');
+    const gameContainer = document.getElementById('gameContainer');
+    const timeLeftSpan = document.getElementById('timeLeft');
+    const hitsSpan = document.getElementById('hits');
+    const missesSpan = document.getElementById('misses');
+    const accuracySpan = document.getElementById('accuracy');
+
+    let hits = 0;
+    let misses = 0;
+    let timeLeft = 60;
+    let gameInterval;
+    let targetInterval;
+
+    function getRandomPosition() {
+      const x = Math.random() * (gameContainer.clientWidth - 40);
+      const y = Math.random() * (gameContainer.clientHeight - 40);
+      return { x, y };
+    }
+
+    function showTarget() {
+      const pos = getRandomPosition();
+      target.style.left = pos.x + 'px';
+      target.style.top = pos.y + 'px';
+      target.style.display = 'block';
+
+      target.onclick = function () {
+        hits++;
+        updateStats();
+        target.style.display = 'none';
+      };
+
+      setTimeout(() => {
+        if (target.style.display === 'block') {
+          misses++;
+          updateStats();
+          target.style.display = 'none';
+        }
+      }, 1000);
+    }
+
+    function updateStats() {
+      hitsSpan.textContent = hits;
+      missesSpan.textContent = misses;
+      let accuracy = hits + misses === 0 ? 0 : Math.round((hits / (hits + misses)) * 100);
+      accuracySpan.textContent = accuracy;
+    }
+
+    function startGame() {
+      hits = 0;
+      misses = 0;
+      timeLeft = 60;
+      updateStats();
+      timeLeftSpan.textContent = timeLeft;
+
+      gameInterval = setInterval(() => {
+        timeLeft--;
+        timeLeftSpan.textContent = timeLeft;
+        if (timeLeft === 0) {
+          clearInterval(gameInterval);
+          clearInterval(targetInterval);
+          target.style.display = 'none';
+          alert('Game Over!\nHits: ' + hits + '\nMisses: ' + misses + '\nAccuracy: ' + accuracySpan.textContent + '%');
+        }
+      }, 1000);
+
+      targetInterval = setInterval(showTarget, 1000);
+    }
+  </script>
+</body>
+</html>
